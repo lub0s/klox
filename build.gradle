@@ -1,0 +1,47 @@
+buildscript {
+  repositories {
+    mavenCentral()
+  }
+  dependencies {
+    classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.6.10'
+  }
+}
+
+apply plugin: 'org.jetbrains.kotlin.jvm'
+
+apply plugin: 'application'
+application.mainClassName = 'com.klox.Main'
+
+dependencies {
+
+  testImplementation 'junit:junit:4.13'
+  testImplementation 'com.google.truth:truth:1.0.1'
+  testImplementation 'io.kotest:kotest-runner-junit5:4.4.1' // https://kotest.io/docs/framework/framework.html
+}
+
+repositories {
+  mavenCentral()
+}
+
+tasks.withType(Test) {
+  useJUnitPlatform()
+}
+
+tasks.named("distTar").configure { task ->
+  task.enabled = false
+}
+
+tasks.withType(org.jetbrains.kotlin.gradle.dsl.KotlinJvmCompile).configureEach { task ->
+  task.kotlinOptions {
+    jvmTarget = '1.8'
+    freeCompilerArgs += [
+      '-XXLanguage:+NewInference',
+      '-progressive',
+      '-Xuse-ir',
+    ]
+  }
+}
+
+run {
+  standardInput = System.in
+}
